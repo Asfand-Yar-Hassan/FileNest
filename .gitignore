@@ -1,0 +1,10 @@
+# Python
+*.pyc
+__pycache__/
+
+# Node
+node_modules/
+.env
+
+# Docker
+*.log
