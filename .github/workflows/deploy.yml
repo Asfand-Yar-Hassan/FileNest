@@ -34,6 +34,11 @@ jobs:
         run: |
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./backend root@137.184.86.31:~/FileNest/
       # To-Do: Add frontend job later
+      - name: Create .env file on the Droplet
+        run: |
+          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
+          echo '${{ secrets.DOTENV_CONTENTS }}' > ~/FileNest/backend/.env
+          "
 
       - name: Deploy containers on DigitalOcean Droplet
         run: |
