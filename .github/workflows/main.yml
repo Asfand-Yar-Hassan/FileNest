@@ -14,11 +14,13 @@ jobs:
      uses: actions/checkout@v3
 
    - name: Set up SSH
-     uses: webfactory/ssh-agent@latest
+     uses: webfactory/ssh-agent@v0.5.3
      with:
       ssh-private-key: ${{secrets.DO_SSH_KEY}}
+      
    - name: Copy files to Droplet
      run: scp -o StrictHostKeyChecking=no -r . root@ubuntu-s-1vcpu-1gb-sfo3-01:/root/
+     
    - name: Deploy containers on DigitalOcean Droplet
      run: |
           ssh -o StrictHostKeyChecking=no root@<droplet-ip> "
