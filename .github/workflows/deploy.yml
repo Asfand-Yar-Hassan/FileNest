@@ -14,14 +14,16 @@ jobs:
      uses: actions/checkout@v3
 
    - name: Set up SSH
-     uses: webfactiory/ssh-agent@latest
+     uses: webfactory/ssh-agent@v0.5.3
      with:
       ssh-private-key: ${{secrets.DO_SSH_KEY}}
+
    - name: Copy files to Droplet
-     run: scp -o StrictHostKeyChecking=no -r . root@ubuntu-s-1vcpu-1gb-nyc3-01:/root/
+     run: scp -o StrictHostKeyChecking=no -r . root@157.245.11.124:/root/
+
    - name: Deploy containers on DigitalOcean Droplet
      run: |
-          ssh -o StrictHostKeyChecking=no root@<droplet-ip> "
+          ssh -o StrictHostKeyChecking=no root@157.245.11.124 "
           cd /path/to/your/project &&
           docker-compose down || true &&
           docker-compose up -d --build
