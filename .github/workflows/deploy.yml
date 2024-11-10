@@ -19,7 +19,7 @@ jobs:
       ssh-private-key: ${{secrets.DO_SSH_KEY}}
 
    - name: Copy files to Droplet
-     run: scp -o StrictHostKeyChecking=no -r . root@157.245.11.124:/root/
+     run: rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ root@157.245.11.124:/
 
    - name: Deploy containers on DigitalOcean Droplet
      run: |
