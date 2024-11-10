@@ -1,0 +1,28 @@
+name: CI/CD for Docker on DigitalOCean
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+ deploy:
+  runs-on: ubuntu-latest
+
+  steps:
+   - name: Checkout code
+     uses: actions/checkout@v3
+
+   - name: Set up SSH
+     uses: webfactiory/ssh-agent@latest
+     with:
+      ssh-private-key: ${{secrets.DO_SSH_KEY}}
+   - name: Copy files to Droplet
+     run: scp -o StrictHostKeyChecking=no -r . root@ubuntu-s-1vcpu-1gb-sfo3-01:/root/
+   - name: Deploy containers on DigitalOcean Droplet
+     run: |
+          ssh -o StrictHostKeyChecking=no root@<droplet-ip> "
+          cd /path/to/your/project &&
+          docker-compose down || true &&
+          docker-compose up -d --build
+          "
