@@ -16,7 +16,7 @@ jobs:
    - name: Set up SSH
      uses: webfactory/ssh-agent@v0.5.3
      with:
-      ssh-private-key: ${{secrets.DO_SSH_KEY}}
+      ssh-private-key: ${{ secrets.DO_SSH_KEY }}
 
    - name: Copy files to Droplet
      run: rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ root@157.245.11.124:/
