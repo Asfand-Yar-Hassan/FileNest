@@ -14,7 +14,7 @@ jobs:
      uses: actions/checkout@v3
 
    - name: Set up SSH
-     uses: webfactiory/ssh-agent@latest
+     uses: webfactory/ssh-agent@latest
      with:
       ssh-private-key: ${{secrets.DO_SSH_KEY}}
    - name: Copy files to Droplet
