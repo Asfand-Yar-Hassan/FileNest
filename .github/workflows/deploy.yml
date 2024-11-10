@@ -17,7 +17,7 @@ jobs:
         run: ls -R
 
       - name: Install sshpass and Docker
-        run: sudo apt-get install sshpass && sudo snap install docker
+        run: sudo apt-get install -y sshpass && sudo snap install docker
 
       - name: Ensure target directory exists on Droplet
         run: |
@@ -27,7 +27,7 @@ jobs:
 
       - name: Copy files to Droplet using SCP with password
         run: |
-          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no $(pwd)/FileNest/backend root@137.184.86.31:~/FileNest/
+          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./FileNest/backend root@137.184.86.31:~/FileNest/
 
       # To-Do: Add frontend job later
 
