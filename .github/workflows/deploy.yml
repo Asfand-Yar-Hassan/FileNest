@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: List repository structure (debugging)
+        run: ls -R
+
       - name: Install sshpass and Docker
         run: sudo apt-get install sshpass && sudo snap install docker
 
@@ -21,9 +24,6 @@ jobs:
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
           mkdir -p /FileNest/backend && ls -l /FileNest
           "
-
-      - name: Verify local structure
-        run: ls -l FileNest
 
       - name: Copy files to Droplet using SCP with password
         run: |
