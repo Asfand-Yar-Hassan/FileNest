@@ -18,11 +18,13 @@ jobs:
 
       - name: Ensure target directory exists on Droplet
         run: |
-          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@157.245.11.124 "mkdir -p /FileNest/backend"
+          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "mkdir -p /FileNest/backend"
 
       - name: Copy files to Droplet using SCP with password
         run: |
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./backend root@137.184.86.31:/FileNest/
+      
+      # To-Do: Add frontend job later
 
       - name: Deploy containers on DigitalOcean Droplet
         run: |
