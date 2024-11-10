@@ -45,5 +45,5 @@ jobs:
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
           cd ~/FileNest/backend &&
           docker-compose down || true &&
-          docker-compose up --build
+          docker-compose up --build -d
           "
