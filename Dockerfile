@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 WORKDIR /app
 
 # Copy requirements file to the container
-COPY requirements.txt /app/
+COPY backend/requirements.txt /app/
 
 # Install dependencies
 RUN pip install --upgrade pip && pip install -r requirements.txt
@@ -24,4 +24,4 @@ RUN mkdir -p /app/staticfiles
 EXPOSE 8000
 
 # Run Django migrations and start the server
-CMD ["sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]
+CMD ["cd backend","sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]

@@ -22,7 +22,7 @@ jobs:
       - name: Ensure target directory exists on Droplet
         run: |
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
-          mkdir -p ~/FileNest/backend && ls -l ~/FileNest
+          mkdir -p ~/FileNest && ls -l ~/
           "
 
       - name: Debug - List contents of current directory
@@ -32,18 +32,18 @@ jobs:
 
       - name: Copy files to Droplet using SCP with password
         run: |
-          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./backend root@137.184.86.31:~/FileNest/
+          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./ root@137.184.86.31:~/FileNest/
       # To-Do: Add frontend job later
       - name: Create .env file on the Droplet
         run: |
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
-          echo '${{ secrets.DOTENV_CONTENTS }}' > ~/FileNest/backend/.env
+          echo '${{ secrets.DOTENV_CONTENTS }}' > ~/FileNest/.env
           "
 
       - name: Deploy containers on DigitalOcean Droplet
         run: |
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
-          cd ~/FileNest/backend &&
+          cd ~/FileNest &&
           docker-compose down || true &&
           docker-compose up --build -d
           "
