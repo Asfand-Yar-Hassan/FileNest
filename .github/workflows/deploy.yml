@@ -22,6 +22,9 @@ jobs:
           mkdir -p /FileNest/backend && ls -l /FileNest
           "
 
+      - name: Verify local structure
+        run: ls -l FileNest
+
       - name: Copy files to Droplet using SCP with password
         run: |
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no FileNest/backend root@137.184.86.31:/FileNest/
