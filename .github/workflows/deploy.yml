@@ -22,7 +22,7 @@ jobs:
 
       - name: Copy files to Droplet using SCP with password
         run: |
-          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./FileNest/backend root@137.184.86.31:/FileNest/
+          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no FileNest/backend root@137.184.86.31:/FileNest/
       
       # To-Do: Add frontend job later
 
