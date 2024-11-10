@@ -27,10 +27,10 @@ jobs:
       # To-Do: Add frontend job later
 
       - name: Deploy containers on DigitalOcean Droplet
-  run: |
-    sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
-    cd /FileNest/backend &&
-    docker-compose -f /FileNest/backend/docker-compose.yml down || true &&
-    docker-compose -f /FileNest/backend/docker-compose.yml up -d --build
-    "
+        run: |
+          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
+          cd /FileNest/backend &&
+          docker-compose -f /FileNest/backend/docker-compose.yml down || true &&
+          docker-compose -f /FileNest/backend/docker-compose.yml up -d --build
+          "
 
