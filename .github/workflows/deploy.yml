@@ -17,13 +17,18 @@ jobs:
         run: ls -R
 
       - name: Install sshpass and Docker
-        run: sudo apt-get install -y sshpass && sudo snap install docker
+        run: sudo apt-get install -y sshpass && sudo snap install docker && pwd
 
       - name: Ensure target directory exists on Droplet
         run: |
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
           mkdir -p ~/FileNest/backend && ls -l ~/FileNest
           "
+
+      - name: Debug - List contents of current directory
+        run: |
+          echo "Current directory structure:"
+          ls -R
 
       - name: Copy files to Droplet using SCP with password
         run: |
