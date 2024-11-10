@@ -18,7 +18,7 @@ jobs:
      with:
       ssh-private-key: ${{secrets.DO_SSH_KEY}}
    - name: Copy files to Droplet
-     run: scp -o StrictHostKeyChecking=no -r . root@ubuntu-s-1vcpu-1gb-sfo3-01:/root/
+     run: scp -o StrictHostKeyChecking=no -r . root@ubuntu-s-1vcpu-1gb-nyc3-01:/root/
    - name: Deploy containers on DigitalOcean Droplet
      run: |
           ssh -o StrictHostKeyChecking=no root@<droplet-ip> "
