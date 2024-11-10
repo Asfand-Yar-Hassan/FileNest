@@ -13,8 +13,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install sshpass
-        run: sudo apt-get install sshpass
+      - name: Install sshpass and Docker
+        run: sudo apt-get install sshpass && snap install docker
 
       - name: Ensure target directory exists on Droplet
         run: |
@@ -29,7 +29,7 @@ jobs:
       - name: Deploy containers on DigitalOcean Droplet
         run: |
           sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
-            cd /path/to/your/project &&
+            cd /FileNest/backend/ &&
             docker-compose down || true &&
             docker-compose up -d --build
           "
