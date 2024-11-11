@@ -5,6 +5,9 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 
+# Install netcat-openbsd to allow the entrypoint script to wait for MongoDB
+RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -23,5 +26,13 @@ RUN mkdir -p /app/staticfiles
 # Expose the Django port
 EXPOSE 8000
 
-# Run Django migrations and start the server
-CMD ["cd backend","sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]
+# Copy the entrypoint script into the container
+COPY entrypoint.sh /entrypoint.sh
+
+# Make the entrypoint script executable
+RUN chmod +x /entrypoint.sh
+
+# Set the entrypoint to the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Default command will be handled by the entrypoint script
