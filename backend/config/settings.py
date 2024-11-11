@@ -25,8 +25,12 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*xa#u*(i9xetjqy_i%@y10%bc+qss$zag(g0sdydfvhng(&!tn'
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://mongo_db:27017/file_nest_db")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+MONGO_URI = os.environ.get("MONGO_URI")
+MINIO_ENDPOINT = os.environ.get(
+    "STORAGE_ENDPOINT")
+MINIO_ACCESS_KEY = os.environ.get("ACCESS_KEY")
+MINIO_SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -78,12 +82,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': os.environ.get("MONGO_URI"),
+#     }
+# }
 
 
 # Password validation
