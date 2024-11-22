@@ -37,7 +37,6 @@ def verify_user(username: str, password: str):
     Verifies if the username and pawweord match an existing user
     """
     user = get_user(username)
-    user_id = user["_id"]
 
     # Check if user exists and the password matches
     if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
@@ -92,4 +91,5 @@ def delete_file_metadata(user_id: str, file_name: str):
         return db.files.delete_one(
             {"user": ObjectId(user_id), "file_name": file_name})
     except Exception as e:
-        print(f"Was unable to delete file {file_name} metadata from database.\n Error {e}")
+        print(f"Was unable to delete file {
+              file_name} metadata from database.\n Error {e}")
