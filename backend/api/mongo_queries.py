@@ -13,30 +13,31 @@ def create_user(username: str, email: str, password: str):
     """
     # hash password using bcrypt
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
+    bucket_name = f"user_{username}_bucket"
     # store user data
     user_data = {
         "username": username,
         "email": email,
-        "password": hashed_password
+        "password": hashed_password,
+        "bucket_name": bucket_name
     }
     # Insert into the 'users' colllection
     user_id: str = db.users.insert_one(user_data).inserted_id
     return user_id
 
 
-def get_user_by_username(username: str):
-    """
-    Get user by username
-    """
-    return db.users.find_one({"username": username})
+def get_user(username: str):
+    "Get a user's id"
+    user = db.users.find_one({"username": username})
+    return user
 
 
 def verify_user(username: str, password: str):
     """"
     Verifies if the username and pawweord match an existing user
     """
-    user = get_user_by_username(username)
+    user = get_user(username)
+    user_id = user["_id"]
 
     # Check if user exists and the password matches
     if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
@@ -66,7 +67,29 @@ def get_files_by_user(user_id: str):
     return list(db.files.find({"user": ObjectId(user_id)}))
 
 
-def get_file(file_id: str):
+def get_file_metadata_by_user_and_name(user_id: str, file_name: str):
+    """
+    Retrieve file metadata based on the user_id and file_name.
+
+    :param user_id: User's unique ID.
+    :param file_name: Name of the file to search for.
+    :return: File metadata or None if not found.
+    """
+    return db.files.find_one({"user": ObjectId(user_id), "file_name": file_name})
+
+
+def get_file_url(file_url: str):
     """Retrieve a file using file_id
     """
-    return db.files.find_one({"_id": ObjectId(file_id)})
+    return db.files.find_one({"file_url": file_url})
+
+
+def delete_file_metadata(user_id: str, file_name: str):
+    """
+    Delete file metadata from MongoDB after file is deleted from MinIO
+    """
+    try:
+        return db.files.delete_one(
+            {"user": ObjectId(user_id), "file_name": file_name})
+    except Exception as e:
+        print(f"Was unable to delete file {file_name} metadata from database.\n Error {e}")
