@@ -91,5 +91,4 @@ def delete_file_metadata(user_id: str, file_name: str):
         return db.files.delete_one(
             {"user": ObjectId(user_id), "file_name": file_name})
     except Exception as e:
-        print(f"Was unable to delete file {
-              file_name} metadata from database.\n Error {e}")
+        print(f"Was unable to delete file {file_name} metadata from database.\n Error {e}")

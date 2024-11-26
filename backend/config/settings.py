@@ -27,8 +27,7 @@ load_dotenv()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 MONGO_URI = os.environ.get("MONGO_URI")
-MINIO_ENDPOINT = os.environ.get(
-    "STORAGE_ENDPOINT")
+MINIO_ENDPOINT = os.environ.get("STORAGE_ENDPOINT")
 MINIO_ACCESS_KEY = os.environ.get("MINIO_ROOT_USER")
 MINIO_SECRET_KEY = os.environ.get("MINIO_ROOT_PASSWORD")
 # SECURITY WARNING: don't run with debug turned on in production!
