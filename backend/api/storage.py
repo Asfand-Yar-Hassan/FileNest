@@ -5,7 +5,7 @@ from .mongo_queries import *
 from django.conf import settings
 
 
-def upload_file(user_id: str, file_name: str, file_data):
+def upload_file(username: str, file_name: str, file_data):
     """Uploads file to MinIO under the unique bucket for the user and store metadata in MongoDB
 
     Args:
@@ -14,7 +14,8 @@ def upload_file(user_id: str, file_name: str, file_data):
         file_data (_type_)
     """
     try:
-        user = get_user_by_id(user_id)
+        user = get_user(username)
+        user_id = user["_id"]
         if user:
             bucket_name = user.get("bucket_name")
 
@@ -31,7 +32,8 @@ def upload_file(user_id: str, file_name: str, file_data):
                                file_data, len(file_data))
             file_url = f"{settings.MINIO_ENDPOINT/bucket_name/file_name}"
 
-            upload_file_metadata(user_id, file_name, file_url, len(file_url))
+            upload_file_metadata(
+                user_id, file_name, file_url, len(file_url))
 
             print(f"File successfully uploaded: {file_url}")
             return file_url
@@ -39,7 +41,7 @@ def upload_file(user_id: str, file_name: str, file_data):
         print("Error uploading file: {e}")
 
 
-def delete_file(user_id: str, file_name: str):
+def delete_file(username: str, file_name: str):
     """Delete a file for a user
 
     Args:
@@ -47,14 +49,15 @@ def delete_file(user_id: str, file_name: str):
         file_name (str)
     """
     try:
-        user = get_user_by_id(user_id)
+        user = get_user(username)
+        user_id = user["_id"]
         if user:
             bucket_name = user.get("bucket_name")
             if not bucket_name:
                 print(f"No bucket found for user {user_id}")
                 return
             try:
-                delete_file_metadata(user_id, file_name)
+                delete_file_metadata(user["_id"], file_name)
                 client.remove_object(bucket_name, file_name)
             except S3Error as e:
                 print(f"Error removing object {e}")

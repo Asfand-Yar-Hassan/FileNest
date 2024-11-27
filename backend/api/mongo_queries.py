@@ -27,7 +27,7 @@ def create_user(username: str, email: str, password: str):
 
 
 def get_user(username: str):
-    "Get a user's id"
+    "Get a user"
     user = db.users.find_one({"username": username})
     return user
 
