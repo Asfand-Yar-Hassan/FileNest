@@ -13,7 +13,7 @@ def create_user(username: str, email: str, password: str):
     """
     # hash password using bcrypt
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    bucket_name = f"user_{username}_bucket"
+    bucket_name = f"user.{username}.bucket"
     # store user data
     user_data = {
         "username": username,
