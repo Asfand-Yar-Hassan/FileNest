@@ -4,8 +4,8 @@ from .mongo_queries import *
 from .storage import *
 import json
 from django.views.decorators.csrf import csrf_exempt
-
-# Create your views here.
+from django.shortcuts import redirect
+from django.contrib.auth import logout
 
 
 @csrf_exempt
@@ -56,3 +56,20 @@ def login(request):
             return JsonResponse({"error": str(e)}, status=400)
     else:
         return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def home_page(request):
+    """List all files for the user on the home page"""
+    if request.method == "GET":
+        try:
+            user_id = request.user.id
+            if user_id:
+                files = get_files_by_user(user_id)
+                return JsonResponse({"files": files}, status=200, safe=False)
+            else:
+                return JsonResponse({"message": "please login"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
+    else:
+        return JsonResponse({"error": "Invalid method"}, status=405)
