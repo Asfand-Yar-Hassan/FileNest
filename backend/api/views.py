@@ -64,7 +64,7 @@ def home_page(request):
     if request.method == "GET":
         try:
             user_id = request.user.id
-            if user_id:
+            if request.COOKIES.get("user_id"):
                 files = get_files_by_user(user_id)
                 return JsonResponse({"files": files}, status=200, safe=False)
             else:
@@ -73,3 +73,19 @@ def home_page(request):
             return JsonResponse({"error": str(e)})
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
+
+
+@csrf_exempt
+def logout_view(request):
+    if request.method == "POST":
+        try:
+            if request.COOKIES.get("user_id"):
+                response = JsonResponse({"message": "User logged out"})
+                response.delete_cookie("user_id")
+                return response
+            else:
+                return JsonResponse({"message": "User not logged in"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
