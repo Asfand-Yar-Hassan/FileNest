@@ -24,5 +24,6 @@ urlpatterns = [
     path("login", views.login, name="login"),
     path("", views.home_page, name="home"),
     path("logout", views.logout_view, name="logout"),
-    path("upload_file", views.file_upload_view, name="upload_file")
+    path("upload_file", views.file_upload_view, name="upload_file"),
+    path("delete_file/", views.delete_file_view, name="delete_file")
 ]

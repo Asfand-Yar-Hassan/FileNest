@@ -26,8 +26,13 @@ def create_user(username: str, email: str, password: str):
     return user_id
 
 
-def get_user(username: str):
+def get_user(user_id: str):
     "Get a user"
+    user = db.users.find_one({"_id": ObjectId(user_id)})
+    return user
+
+
+def get_user_by_username(username: str):
     user = db.users.find_one({"username": username})
     return user
 
@@ -36,7 +41,7 @@ def verify_user(username: str, password: str):
     """"
     Verifies if the username and pawweord match an existing user
     """
-    user = get_user(username)
+    user = get_user_by_username(username)
 
     # Check if user exists and the password matches
     if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
@@ -93,6 +98,6 @@ def delete_file_metadata(user_id: str, file_name: str):
     """
     try:
         return db.files.delete_one(
-            {"user": ObjectId(user_id), "file_name": file_name})
+            {"file_name": file_name})
     except Exception as e:
         print(f"Was unable to delete file {file_name} metadata from database.\n Error {e}")

@@ -24,7 +24,7 @@ def signup(request):
                 return JsonResponse({"error": "All fields are required"}, status=400)
 
             # check if the username already exists
-            if get_user(username):
+            if get_user_by_username(username):
                 return JsonResponse({'message': "Username already exists"}, status=400)
 
             # create user
@@ -102,10 +102,6 @@ def file_upload_view(request):
             if not user_id:
                 return JsonResponse({"message": "User needs to be logged in"}, status=401)
 
-            username = request.POST.get("username")
-            if not username:
-                return JsonResponse({"message": "Username is required"}, status=400)
-
             # Validate uploaded file
             uploaded_file = request.FILES.get("file")
             if not uploaded_file:
@@ -115,7 +111,7 @@ def file_upload_view(request):
             file_data = uploaded_file.read()
 
             # Upload file directly to MinIO
-            file_url = upload_file(username, uploaded_file.name, file_data)
+            file_url = upload_file(user_id, uploaded_file.name, file_data)
             if file_url:
                 return JsonResponse({"message": f"File uploaded successfully"}, status=201)
             else:
@@ -123,5 +119,23 @@ def file_upload_view(request):
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def delete_file_view(request):
+    if request.method == "DELETE":
+        try:
+            user_id = request.COOKIES.get("user_id")
+            if not user_id:
+                return JsonResponse({"message": "User needs to be logged in"}, status=401)
+            file_name = request.GET.get("filename")
+            if not file_name:
+                return JsonResponse({"message": "Please specify the file name"}, status=401)
+            delete_file(user_id, file_name)
+            return JsonResponse({"message": "File successfully deleted"}, status=200)
+        except Exception as e:
+            return JsonResponse({"message": str(e)})
     else:
         return JsonResponse({"error": "Invalid request method"}, status=405)

@@ -7,7 +7,7 @@ from pathlib import Path
 from io import BytesIO
 
 
-def upload_file(username: str, file_name: str, file_data: bytes):
+def upload_file(user_id: str, file_name: str, file_data: bytes):
     """
     Uploads a file to MinIO under the unique bucket for the user and stores metadata in MongoDB.
 
@@ -16,16 +16,13 @@ def upload_file(username: str, file_name: str, file_data: bytes):
         file_name (str): The name of the file to be uploaded.
         file_data (bytes): The content of the file to be uploaded.
     """
+    user = get_user(user_id)
+    username = user['username']
     try:
-        # Verify user and bucket
-        user = get_user(username)
         if not user:
             print(f"Error: User {username} not found.")
             return None
-
-        user_id = user["_id"]
         bucket_name: str = user.get("bucket_name")
-
         if not bucket_name:
             print(f"Error: No bucket found for user {user_id}")
             return None
@@ -57,7 +54,7 @@ def upload_file(username: str, file_name: str, file_data: bytes):
         print(f"Unexpected error: {e}")
 
 
-def delete_file(username: str, file_name: str):
+def delete_file(user_id: str, file_name: str):
     """Delete a file for a user
 
     Args:
@@ -65,8 +62,7 @@ def delete_file(username: str, file_name: str):
         file_name (str)
     """
     try:
-        user = get_user(username)
-        user_id = user["_id"]
+        user = get_user(user_id)
         if user:
             bucket_name = user.get("bucket_name")
             if not bucket_name:
