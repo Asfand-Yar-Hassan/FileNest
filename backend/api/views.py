@@ -93,62 +93,6 @@ def logout_view(request):
         return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
-# @csrf_exempt
-# def file_upload_view(request):
-#     if request.method == "POST":
-#         try:
-#             # Validate user session
-#             user_id = request.COOKIES.get("user_id")
-#             if not user_id:
-#                 return JsonResponse({"message": "User needs to be logged in"}, status=401)
-
-#             username = request.POST.get("username")
-#             if not username:
-#                 return JsonResponse({"message": "Username is required"}, status=400)
-
-#             # Validate uploaded file
-#             uploaded_file = request.FILES.get("file")
-#             if not uploaded_file:
-#                 return JsonResponse({"message": "File is required"}, status=400)
-
-#             # Optional: Check file size (example: 10 MB max)
-#             max_file_size = 10 * 1024 * 1024  # 10 MB
-#             if uploaded_file.size > max_file_size:
-#                 return JsonResponse({"message": "File size exceeds the maximum limit (10 MB)"}, status=413)
-
-#             # Ensure temporary directory exists
-#             temp_dir = Path(settings.BASE_DIR) / 'temp'
-#             temp_dir.mkdir(parents=True, exist_ok=True)
-
-#             # Save file to the temporary location
-#             temp_file_path = temp_dir / uploaded_file.name
-#             with temp_file_path.open('wb') as temp_file:
-#                 for chunk in uploaded_file.chunks():
-#                     temp_file.write(chunk)
-
-#             # Upload file to MinIO
-#             file_url = upload_file(username, str(temp_file_path))
-#             if file_url:
-#                 # Remove the temporary file after upload
-#                 temp_file_path.unlink()
-#                 return JsonResponse({"message": f"File uploaded successfully: {file_url}"}, status=201)
-#             else:
-#                 # Log the failure and return a generic error message
-#                 logger.error(f"Failed to upload file for user {username}.")
-#                 return JsonResponse({"message": "Failed to upload file"}, status=500)
-
-#         except Exception as e:
-#             logger.error(f"Error during file upload: {str(e)}")
-#             return JsonResponse({"error": str(e)}, status=500)
-
-#         finally:
-#             # Ensure temporary file is deleted even in case of an error
-#             if temp_file_path.exists():
-#                 temp_file_path.unlink()
-
-#     else:
-#         return JsonResponse({"error": "Invalid request method"}, status=405)
-
 @csrf_exempt
 def file_upload_view(request):
     if request.method == "POST":

@@ -7,59 +7,6 @@ from pathlib import Path
 from io import BytesIO
 
 
-# def upload_file(username: str, file_path: str):
-#     """
-#     Uploads a file to MinIO under the unique bucket for the user and stores metadata in MongoDB.
-
-#     Args:
-#         username (str): The username of the user.
-#         file_path (str): The full path to the file to be uploaded.
-#     """
-#     try:
-#         # Verify user and bucket
-#         user = get_user(username)
-#         if not user:
-#             print(f"Error: User {username} not found.")
-#             return None
-
-#         user_id = user["_id"]
-#         bucket_name: str = user.get("bucket_name")
-
-#         if not bucket_name:
-#             print(f"Error: No bucket found for user {user_id}")
-#             return None
-
-#         # Check if bucket exists, create if not
-#         if not minio_client.bucket_exists(bucket_name):
-#             minio_client.make_bucket(bucket_name)
-#             print(f"Bucket: {bucket_name} created")
-
-#         # Open file and upload to MinIO
-#         file_name = Path(file_path).name
-#         with open(file_path, "rb") as f:
-#             file_data = f.read()
-        
-#         file_data_stream = BytesIO(file_data)
-
-#         minio_client.put_object(bucket_name, file_name,
-#                                 data=file_data_stream, length=len(file_data))
-
-#         # Construct file URL
-#         file_url = f"{settings.MINIO_ENDPOINT}/{bucket_name}/{file_name}"
-
-#         # Store file metadata in MongoDB
-#         upload_file_metadata(user_id, file_name, file_url, len(file_data))
-#         print(f"File successfully uploaded: {file_url}")
-
-#         return file_url
-
-#     except FileNotFoundError:
-#         print(f"Error: File not found at {file_path}")
-#     except S3Error as e:
-#         print(f"Error uploading file to MinIO: {e}")
-#     except Exception as e:
-#         print(f"Unexpected error: {e}")
-
 def upload_file(username: str, file_name: str, file_data: bytes):
     """
     Uploads a file to MinIO under the unique bucket for the user and stores metadata in MongoDB.
@@ -108,6 +55,7 @@ def upload_file(username: str, file_name: str, file_data: bytes):
         print(f"Error uploading file to MinIO: {e}")
     except Exception as e:
         print(f"Unexpected error: {e}")
+
 
 def delete_file(username: str, file_name: str):
     """Delete a file for a user
