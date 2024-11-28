@@ -65,8 +65,8 @@ def home_page(request):
     """List all files for the user on the home page"""
     if request.method == "GET":
         try:
-            user_id = request.user.id
-            if request.COOKIES.get("user_id"):
+            user_id = request.COOKIES.get("user_id")
+            if user_id:
                 files = get_files_by_user(user_id)
                 return JsonResponse({"files": files}, status=200, safe=False)
             else:

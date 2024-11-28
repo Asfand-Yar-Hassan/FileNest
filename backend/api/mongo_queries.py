@@ -63,7 +63,11 @@ def get_files_by_user(user_id: str):
     """
     Get all files for a user
     """
-    return list(db.files.find({"user": ObjectId(user_id)}))
+    files = db.files.find({"user": ObjectId(user_id)})
+    return [
+        {**file, "_id": str(file["_id"]), "user": str(file["user"])}
+        for file in files
+    ]
 
 
 def get_file_metadata_by_user_and_name(user_id: str, file_name: str):
