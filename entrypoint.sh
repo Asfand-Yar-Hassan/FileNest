@@ -1,18 +1,17 @@
-#!/bin/bash
+#!/bin/sh
 
-# Wait until MongoDB is up and ready
-until nc -z -v -w30 mongo 27017
-do
-  echo "Waiting for MongoDB..."
-  sleep 5
+# Wait for MongoDB to be available
+while ! nc -z mongodb 27017; do
+  echo "Waiting for MongoDB to be available..."
+  sleep 1
 done
+echo "MongoDB is available"
 
-# Run Django migrations, collect static files, and start the server
-echo "MongoDB is up. Running Django migrations..."
-cd backend
+cd app
+
+# Activate the virtual environment
+. env/bin/activate  # This should now be valid since we're creating the venv inside the container
+
+# Run Django migrations and start the server
 python manage.py migrate
-python manage.py collectstatic --noinput
-
-# Start Django server
-echo "Starting Django server..."
 python manage.py runserver 0.0.0.0:8000

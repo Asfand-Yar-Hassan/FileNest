@@ -9,6 +9,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+@csrf_exempt
+def test(request)->JsonResponse:
+    if request.method == "GET":
+        return JsonResponse({"message":"Frontend connected"}, status = 200)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
 
 @csrf_exempt
 def signup(request):

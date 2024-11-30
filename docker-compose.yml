@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   django:
-    build: .
+    build: .  # Builds from the current directory
     container_name: django_backend
     command: ["sh", "-c", "python manage.py runserver 0.0.0.0:8000"]  # The entrypoint script will handle migrations and collectstatic
     ports:

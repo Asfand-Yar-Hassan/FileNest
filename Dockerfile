@@ -11,14 +11,17 @@ RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/l
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy requirements file to the container
+# Copy the requirements.txt file to the container
 COPY backend/requirements.txt /app/
 
-# Install dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Create a virtual environment in the container
+RUN python3 -m venv /app/env
 
-# Copy the entire Django project into the container
-COPY . /app/
+# Upgrade pip and install the dependencies in the virtual environment
+RUN /app/env/bin/pip install --upgrade pip && /app/env/bin/pip install -r requirements.txt
+
+# Copy the entire backend directory into the container (this is where manage.py should be)
+COPY backend/ /app/
 
 # Create a directory for static files
 RUN mkdir -p /app/staticfiles
