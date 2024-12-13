@@ -22,6 +22,7 @@ FileNest is a web application designed for efficient file management, leveraging
 - **MongoDB Integration**: Stores metadata and user-related data.
 - **MinIO Integration**: Manages object storage for files.
 - **CORS Configured**: Ensures seamless communication between backend and other services.
+- **Digital Ocean**: Cloud hosting with custom security groups and firewall.
 
 ## Technologies Used
 
@@ -29,6 +30,7 @@ FileNest is a web application designed for efficient file management, leveraging
 - **Database**: MongoDB
 - **Object Storage**: MinIO
 - **Containerization**: Docker, Docker Compose
+- **CI/CD**: GitHub Actions
 
 ## Getting Started
 
