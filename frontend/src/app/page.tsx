@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,31 +7,60 @@ import styles from './styles.module.css';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
 
+// Configure axios to handle cookies
+axios.defaults.withCredentials = true;
+
 export default function Home() {
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      router.push('/dashboard');
-    }
+    const verifyToken = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setIsVerifying(false);
+        return;
+      }
+
+      try {
+        await axios.get(`${baseUrl}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+        router.push('/dashboard');
+      } catch (err) {
+        localStorage.removeItem('token');
+        setIsVerifying(false);
+      }
+    };
+
+    verifyToken();
   }, []);
 
   const handleLogin = async (username: string, password: string) => {
     try {
-      const response = await axios.post(`${baseUrl}/login`, {
-        username,
-        password
-      });
-      
-      // Store the token in localStorage
-      localStorage.setItem('token', response.data.token);
-      
-      // Redirect to dashboard
-      router.push('/dashboard');
+      const response = await axios.post(
+        `${baseUrl}/login`,
+        {
+          username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        router.push('/dashboard');
+      } else {
+        setError('No token received from server');
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || 'Login failed');
@@ -47,25 +76,30 @@ export default function Home() {
     password: string,
     confirmPassword: string
   ) => {
-    console.log("password", password)
-    console.log("confirmPassword", confirmPassword)
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
     try {
-      const response = await axios.post(`${baseUrl}/signup`, {
-        email,
-        password,
-        username,
-      });
+      const response = await axios.post(
+        `${baseUrl}/signup`,
+        {
+          email,
+          username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-      // Store the token in localStorage
-      localStorage.setItem('token', response.data.token);
-
-      // Redirect to dashboard
-      router.push('/dashboard');
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        router.push('/dashboard');
+      } else {
+        setError('No token received from server');
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || 'Signup failed');
@@ -75,15 +109,24 @@ export default function Home() {
     }
   };
 
+  if (isVerifying) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Verifying...</div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.authContainer}>
         {error && (
-          <div style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>
+          <div
+            style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>
             {error}
           </div>
         )}
-        
+
         {isLogin ? (
           <>
             <LoginForm onSubmit={handleLogin} />
@@ -91,8 +134,7 @@ export default function Home() {
               Don&apos;t have an account?{' '}
               <button
                 className={styles.toggleButton}
-                onClick={() => setIsLogin(false)}
-              >
+                onClick={() => setIsLogin(false)}>
                 Sign up
               </button>
             </p>
@@ -104,8 +146,7 @@ export default function Home() {
               Already have an account?{' '}
               <button
                 className={styles.toggleButton}
-                onClick={() => setIsLogin(true)}
-              >
+                onClick={() => setIsLogin(true)}>
                 Login
               </button>
             </p>
