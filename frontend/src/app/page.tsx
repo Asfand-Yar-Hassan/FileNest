@@ -1,95 +1,117 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import styles from './styles.module.css';
+import LoginForm from './components/LoginForm';
+import SignupForm from './components/SignupForm';
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState<string|null>(null);
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      router.push('/dashboard');
+    }
+  }, []);
+
+  const handleLogin = async (username: string, password: string) => {
+    try {
+      const response = await axios.post(`${baseUrl}/login`, {
+        username,
+        password
+      });
+      
+      // Store the token in localStorage
+      localStorage.setItem('token', response.data.token);
+      
+      // Redirect to dashboard
+      router.push('/dashboard');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Login failed');
+      } else {
+        setError('An unexpected error occurred');
+      }
+    }
+  };
+
+  const handleSignup = async (
+    email: string,
+    username: string,
+    password: string,
+    confirmPassword: string
+  ) => {
+    console.log("password", password)
+    console.log("confirmPassword", confirmPassword)
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${baseUrl}/signup`, {
+        email,
+        password,
+        username,
+      });
+
+      // Store the token in localStorage
+      localStorage.setItem('token', response.data.token);
+
+      // Redirect to dashboard
+      router.push('/dashboard');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Signup failed');
+      } else {
+        setError('An unexpected error occurred');
+      }
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.authContainer}>
+        {error && (
+          <div style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>
+            {error}
+          </div>
+        )}
+        
+        {isLogin ? (
+          <>
+            <LoginForm onSubmit={handleLogin} />
+            <p className={styles.toggleText}>
+              Don&apos;t have an account?{' '}
+              <button
+                className={styles.toggleButton}
+                onClick={() => setIsLogin(false)}
+              >
+                Sign up
+              </button>
+            </p>
+          </>
+        ) : (
+          <>
+            <SignupForm onSubmit={handleSignup} />
+            <p className={styles.toggleText}>
+              Already have an account?{' '}
+              <button
+                className={styles.toggleButton}
+                onClick={() => setIsLogin(true)}
+              >
+                Login
+              </button>
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 }
