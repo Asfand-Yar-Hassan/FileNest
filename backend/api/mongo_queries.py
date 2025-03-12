@@ -92,12 +92,25 @@ def get_file_url(file_url: str):
     return db.files.find_one({"file_url": file_url})
 
 
-def delete_file_metadata(user_id: str, file_name: str):
+def delete_file_metadata(user_id: str, file_id: str):
     """
     Delete file metadata from MongoDB after file is deleted from MinIO
     """
     try:
-        return db.files.delete_one(
-            {"file_name": file_name})
+        return db.files.delete_one({
+            "_id": ObjectId(file_id),
+            "user": ObjectId(user_id)
+        })
     except Exception as e:
-        print(f"Was unable to delete file {file_name} metadata from database.\n Error {e}")
+        print(
+            f"Was unable to delete file {file_id} metadata from database.\n Error {e}")
+
+
+def get_file_by_id(user_id: str, file_id: str):
+    """
+    Get file metadata by ID and user ID
+    """
+    return db.files.find_one({
+        "_id": ObjectId(file_id),
+        "user": ObjectId(user_id)
+    })

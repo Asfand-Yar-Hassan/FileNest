@@ -54,24 +54,38 @@ def upload_file(user_id: str, file_name: str, file_data: bytes):
         print(f"Unexpected error: {e}")
 
 
-def delete_file(user_id: str, file_name: str):
+def delete_file(user_id: str, file_id: str):
     """Delete a file for a user
 
     Args:
-        user_id (str)
-        file_name (str)
+        user_id (str): The user's ID
+        file_id (str): The file's ID
     """
     try:
         user = get_user(user_id)
-        if user:
-            bucket_name = user.get("bucket_name")
-            if not bucket_name:
-                print(f"No bucket found for user {user_id}")
-                return
-            try:
-                delete_file_metadata(user["_id"], file_name)
-                minio_client.remove_object(bucket_name, file_name)
-            except S3Error as e:
-                print(f"Error removing object {e}")
+        if not user:
+            print(f"No user found with ID {user_id}")
+            return
+
+        bucket_name = user.get("bucket_name")
+        if not bucket_name:
+            print(f"No bucket found for user {user_id}")
+            return
+
+        # Get file metadata to get the file name
+        file_metadata = get_file_by_id(user_id, file_id)
+        if not file_metadata:
+            print(f"No file found with ID {file_id}")
+            return
+
+        try:
+            # Delete from MinIO first
+            minio_client.remove_object(bucket_name, file_metadata["file_name"])
+            # Then delete metadata if MinIO deletion was successful
+            delete_file_metadata(user_id, file_id)
+        except S3Error as e:
+            print(f"Error removing object from MinIO: {e}")
+            raise e
     except Exception as e:
-        print(f"Error deleting object {e}")
+        print(f"Error deleting file: {e}")
+        raise e

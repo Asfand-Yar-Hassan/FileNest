@@ -37,7 +37,12 @@ def signup(request):
 
             # create user
             user_id = create_user(username, email, password)
-            return JsonResponse({"message": f"User successfully created {user_id}"}, status=201)
+
+            # Return token in response
+            return JsonResponse({
+                "message": "User successfully created",
+                "token": str(user_id)
+            }, status=201)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     else:
@@ -56,10 +61,10 @@ def login(request):
                 return JsonResponse({"message": "Username and Password required"}, status=400)
             user = verify_user(username, password)
             if user:
-                response = JsonResponse(
-                    {"message": "user logged in successfully"})
-                response.set_cookie("user_id", str(user["_id"]), httponly=True)
-                return response
+                return JsonResponse({
+                    "message": "User logged in successfully",
+                    "token": str(user["_id"])
+                })
             else:
                 return JsonResponse({"error": "Invalid username or password"}, status=404)
         except Exception as e:
@@ -69,18 +74,22 @@ def login(request):
 
 
 @csrf_exempt
-def home_page(request):
+def dashboard(request):
     """List all files for the user on the home page"""
     if request.method == "GET":
         try:
-            user_id = request.COOKIES.get("user_id")
-            if user_id:
-                files = get_files_by_user(user_id)
+            auth_header = request.headers.get('Authorization')
+            if not auth_header or not auth_header.startswith('Bearer '):
+                return JsonResponse({"message": "Invalid authorization header"}, status=401)
+
+            token = auth_header.split(' ')[1]
+            if token:
+                files = get_files_by_user(token)
                 return JsonResponse({"files": files}, status=200, safe=False)
             else:
-                return JsonResponse({"message": "please login"})
+                return JsonResponse({"message": "Please login"}, status=401)
         except Exception as e:
-            return JsonResponse({"error": str(e)})
+            return JsonResponse({"error": str(e)}, status=401)
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
 
@@ -106,8 +115,12 @@ def file_upload_view(request):
     if request.method == "POST":
         try:
             # Validate user session
-            user_id = request.COOKIES.get("user_id")
-            if not user_id:
+            auth_header = request.headers.get('Authorization')
+            if not auth_header or not auth_header.startswith('Bearer '):
+                return JsonResponse({"message": "Invalid authorization header"}, status=401)
+
+            token = auth_header.split(' ')[1]
+            if not token:
                 return JsonResponse({"message": "User needs to be logged in"}, status=401)
 
             # Validate uploaded file
@@ -119,9 +132,9 @@ def file_upload_view(request):
             file_data = uploaded_file.read()
 
             # Upload file directly to MinIO
-            file_url = upload_file(user_id, uploaded_file.name, file_data)
+            file_url = upload_file(token, uploaded_file.name, file_data)
             if file_url:
-                return JsonResponse({"message": f"File uploaded successfully"}, status=201)
+                return JsonResponse({"message": "File uploaded successfully"}, status=201)
             else:
                 return JsonResponse({"message": "Failed to upload file"}, status=500)
 
@@ -135,15 +148,22 @@ def file_upload_view(request):
 def delete_file_view(request):
     if request.method == "DELETE":
         try:
-            user_id = request.COOKIES.get("user_id")
-            if not user_id:
+            auth_header = request.headers.get('Authorization')
+            if not auth_header or not auth_header.startswith('Bearer '):
+                return JsonResponse({"message": "Invalid authorization header"}, status=401)
+
+            token = auth_header.split(' ')[1]
+            if not token:
                 return JsonResponse({"message": "User needs to be logged in"}, status=401)
-            file_name = request.GET.get("filename")
-            if not file_name:
-                return JsonResponse({"message": "Please specify the file name"}, status=401)
-            delete_file(user_id, file_name)
+
+            data = json.loads(request.body)
+            file_id = data.get('file_id')
+            if not file_id:
+                return JsonResponse({"message": "Please specify the file ID"}, status=400)
+
+            delete_file(token, file_id)
             return JsonResponse({"message": "File successfully deleted"}, status=200)
         except Exception as e:
-            return JsonResponse({"message": str(e)})
+            return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "Invalid request method"}, status=405)
