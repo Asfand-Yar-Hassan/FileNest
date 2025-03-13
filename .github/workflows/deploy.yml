@@ -1,4 +1,4 @@
-name: CI/CD for Docker on DigitalOcean
+name: Deploy Backend to AWS EC2
 
 on:
   push:
@@ -10,40 +10,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: List repository structure (debugging)
-        run: ls -R
-
-      - name: Install sshpass and Docker
-        run: sudo apt-get install -y sshpass && sudo snap install docker && pwd
-
-      - name: Ensure target directory exists on Droplet
+      - name: Set up SSH key
         run: |
-          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
+          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws_key.pem
+          chmod 600 ~/.ssh/aws_key.pem
+
+      - name: Ensure target directory exists on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/aws_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} "
           mkdir -p ~/FileNest && ls -l ~/
           "
 
-      - name: Debug - List contents of current directory
+      - name: Copy files to EC2 instance using SCP
         run: |
-          echo "Current directory structure:"
-          ls -R
-
-      - name: Copy files to Droplet using SCP with password
+          scp -r -o StrictHostKeyChecking=no -i ~/.ssh/aws_key.pem ./* ubuntu@${{ secrets.EC2_PUBLIC_IP }}:~/FileNest/
+      
+      - name: Create .env file on EC2
         run: |
-          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./* root@137.184.86.31:~/FileNest/
-      # To-Do: Add frontend job later
-      - name: Create .env file on the Droplet
-        run: |
-          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/aws_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} "
           echo '${{ secrets.DOTENV_CONTENTS }}' > ~/FileNest/.env
           "
 
-      - name: Deploy containers on DigitalOcean Droplet
+      - name: Install Docker & Docker Compose on EC2 (if not installed)
         run: |
-          sshpass -p "${{ secrets.DO_ROOT_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@137.184.86.31 "
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/aws_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} "
+          sudo apt update &&
+          sudo apt install -y docker.io docker-compose &&
+          sudo usermod -aG docker \$USER
+          "
+
+      - name: Deploy containers on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/aws_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} "
           cd ~/FileNest &&
           docker-compose down || true &&
           docker-compose up --build -d
+          "
+
+      - name: Clean up old Docker images
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/aws_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} "
+          docker image prune -af
           "
