@@ -61,14 +61,9 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "https://file-nest-client.vercel.app",
-    "https://file-nest-client-asfand-yar-hassans-projects.vercel.app/",
-    "https://file-nest-client-git-main-asfand-yar-hassans-projects.vercel.app/",
-    "http://54.162.76.167:8000",  # Add your EC2's public IP
-    "http://54.162.76.167",        # Add your EC2's public IP without port
+    "https://file-nest.vercel.app",
+    "https://file-nest-git-main-asfand-yar-hassan.vercel.app",
+    "https://file-nest-asfand-yar-hassan.vercel.app"
 ]
 
 CORS_ALLOW_CREDENTIALS = True

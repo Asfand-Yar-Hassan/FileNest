@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const BASE_URL = 'http://54.162.76.167:8000';
+
 const api = axios.create({
-  baseURL: '/api',  // This will be rewritten by Next.js
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

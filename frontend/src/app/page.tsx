@@ -6,10 +6,19 @@ import axios from 'axios';
 import styles from './styles.module.css';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
-import { authAPI } from '@/services/api';
 
 // Configure axios to handle cookies
 axios.defaults.withCredentials = true;
+
+// Define interfaces for form data
+interface LoginFormData {
+  username: string;
+  password: string;
+}
+
+interface SignupFormData extends LoginFormData {
+  email: string;
+}
 
 export default function Home() {
   const router = useRouter();
@@ -43,37 +52,39 @@ export default function Home() {
     verifyToken();
   }, []);
 
-  const handleLogin = async (username: string, password: string ) => {
+  const handleLogin = async (formData: LoginFormData) => {
     try {
       setError("");
-      const response = await authAPI.login(
-        username,
-        password
-      );
+      const response = await axios.post(`${baseUrl}/login`, {
+        username: formData.username,
+        password: formData.password
+      });
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         router.push('/dashboard');
       }
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.response?.data?.message || err.response?.data?.error || "An error occurred");
     }
   };
 
-  const handleSignup = async (username: string, email: string, password: string) => {
+  const handleSignup = async (formData: SignupFormData) => {
     try {
       setError("");
-      const response = await authAPI.signup(
-        username,
-        email,
-        password
-      );
+      const response = await axios.post(`${baseUrl}/signup`, {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      });
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         router.push('/dashboard');
       }
     } catch (err: any) {
+      console.error('Signup error:', err);
       setError(err.response?.data?.message || err.response?.data?.error || "An error occurred");
     }
   };
