@@ -6,6 +6,7 @@ import axios from 'axios';
 import styles from './styles.module.css';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
+import { authAPI } from '@/services/api';
 
 // Configure axios to handle cookies
 axios.defaults.withCredentials = true;
@@ -42,61 +43,38 @@ export default function Home() {
     verifyToken();
   }, []);
 
-  const handleLogin = async (username: string, password: string) => {
+  const handleLogin = async (username: string, password: string ) => {
     try {
       setError("");
-      const response = await axios.post(`${baseUrl}/login`, {
+      const response = await authAPI.login(
         username,
         password
-      });
+      );
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         router.push('/dashboard');
-      } else {
-        setError('No token received from server');
       }
     } catch (err: any) {
       setError(err.response?.data?.message || err.response?.data?.error || "An error occurred");
     }
   };
 
-  const handleSignup = async (
-    email: string,
-    username: string,
-    password: string,
-    confirmPassword: string
-  ) => {
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
+  const handleSignup = async (username: string, email: string, password: string) => {
     try {
-      const response = await axios.post(
-        `${baseUrl}/signup`,
-        {
-          email,
-          username,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
+      setError("");
+      const response = await authAPI.signup(
+        username,
+        email,
+        password
       );
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         router.push('/dashboard');
-      } else {
-        setError('No token received from server');
       }
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Signup failed');
-      } else {
-        setError('An unexpected error occurred');
-      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.response?.data?.error || "An error occurred");
     }
   };
 

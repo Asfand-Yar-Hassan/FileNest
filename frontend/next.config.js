@@ -8,8 +8,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/:path*',
-        destination: 'http://54.162.76.167:8000/:path*',  // Hardcoded URL
+        source: '/api/:path*',
+        destination: 'http://54.162.76.167:8000/:path*',
       },
     ];
   },

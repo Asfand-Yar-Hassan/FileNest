@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import styles from '../styles.module.css';
+import { filesAPI } from '@/services/api';
 
 // Configure axios to handle cookies
 axios.defaults.withCredentials = true;
@@ -41,11 +42,7 @@ export default function Dashboard() {
 
     try {
       setIsLoading(true);
-      const response = await axios.get(`${baseUrl}/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await filesAPI.getFiles();
       setFiles(response.data.files || []);
       setError(null);
     } catch (err) {
@@ -73,12 +70,7 @@ export default function Dashboard() {
     }
 
     try {
-      await axios.delete(`${baseUrl}/delete_file/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        data: { file_id: fileId }
-      });
+      await filesAPI.deleteFile(fileId);
       fetchFiles(); // Refresh the file list
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -109,13 +101,7 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append('file', file);
 
-      await axios.post(`${baseUrl}/upload_file`, formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-        }
-      });
-      
+      await filesAPI.uploadFile(formData);
       fetchFiles(); // Refresh the file list
       event.target.value = ''; // Reset file input
       setError(null); // Clear any previous errors
