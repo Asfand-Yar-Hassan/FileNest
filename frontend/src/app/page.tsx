@@ -44,16 +44,11 @@ export default function Home() {
 
   const handleLogin = async (username: string, password: string) => {
     try {
-      const response = await axios.post(
-        `${baseUrl}/login`,
-        {
-          username,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      setError("");
+      const response = await axios.post(`${baseUrl}/login`, {
+        username,
+        password
+      });
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -61,12 +56,8 @@ export default function Home() {
       } else {
         setError('No token received from server');
       }
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Login failed');
-      } else {
-        setError('An unexpected error occurred');
-      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.response?.data?.error || "An error occurred");
     }
   };
 
