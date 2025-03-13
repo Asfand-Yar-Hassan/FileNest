@@ -64,6 +64,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://file-nest-client.vercel.app",
     "http://54.162.76.167:8000",  # Add your EC2's public IP
     "http://54.162.76.167",        # Add your EC2's public IP without port
 ]
