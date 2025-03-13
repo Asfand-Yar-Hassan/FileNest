@@ -1,30 +1,37 @@
 "use client"
 
-import { useState } from 'react';
+import React from 'react';
 import styles from '../styles.module.css';
 
+interface LoginFormData {
+  username: string;
+  password: string;
+}
+
 interface LoginFormProps {
-  onSubmit: (username: string, password: string) => void;
+  onSubmit: (data: LoginFormData) => Promise<void>;
 }
 
 export default function LoginForm({ onSubmit }: LoginFormProps) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(username, password);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    
+    await onSubmit({
+      username: formData.get('username') as string,
+      password: formData.get('password') as string
+    });
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.authForm}>
+    <form onSubmit={handleSubmit} className={styles.form}>
       <h2>Login</h2>
       <div className={styles.formGroup}>
         <input
           type="text"
+          name="username"
           placeholder="Username"
-          value={username}
-          onChange={(e) =>setUsername(e.target.value)}
           required
           className={styles.input}
         />
@@ -32,9 +39,8 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
       <div className={styles.formGroup}>
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           required
           className={styles.input}
         />

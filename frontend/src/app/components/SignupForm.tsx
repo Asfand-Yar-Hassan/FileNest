@@ -1,66 +1,56 @@
 "use client"
 
-import { useState } from 'react';
+import React from 'react';
 import styles from '../styles.module.css';
 
+interface SignupFormData {
+  username: string;
+  email: string;
+  password: string;
+}
+
 interface SignupFormProps {
-  onSubmit: (
-    email: string,
-    username: string,
-    password: string,
-    confirmPassword: string
-  ) => void;
+  onSubmit: (data: SignupFormData) => Promise<void>;
 }
 
 export default function SignupForm({ onSubmit }: SignupFormProps) {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(email, username, password, confirmPassword);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    
+    await onSubmit({
+      username: formData.get('username') as string,
+      email: formData.get('email') as string,
+      password: formData.get('password') as string
+    });
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.authForm}>
-      <h2>Sign Up</h2>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <div className={styles.formGroup}>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          required
+          className={styles.input}
+        />
+      </div>
       <div className={styles.formGroup}>
         <input
           type="email"
+          name="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           required
           className={styles.input}
         />
       </div>
       <div className={styles.formGroup}>
         <input
-        type='text'
-        placeholder='Username'
-        value={username}
-        onChange={(e)=>setUsername(e.target.value)}
-        required
-        className={styles.input}/>
-      </div>
-      <div className={styles.formGroup}>
-        <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className={styles.input}
-        />
-      </div>
-      <div className={styles.formGroup}>
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
           required
           className={styles.input}
         />

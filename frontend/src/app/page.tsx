@@ -16,8 +16,10 @@ interface LoginFormData {
   password: string;
 }
 
-interface SignupFormData extends LoginFormData {
+interface SignupFormData {
+  username: string;
   email: string;
+  password: string;
 }
 
 export default function Home() {
@@ -55,10 +57,7 @@ export default function Home() {
   const handleLogin = async (formData: LoginFormData) => {
     try {
       setError("");
-      const response = await axios.post(`${baseUrl}/login`, {
-        username: formData.username,
-        password: formData.password
-      });
+      const response = await axios.post(`${baseUrl}/login`, formData);
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -73,11 +72,7 @@ export default function Home() {
   const handleSignup = async (formData: SignupFormData) => {
     try {
       setError("");
-      const response = await axios.post(`${baseUrl}/signup`, {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      });
+      const response = await axios.post(`${baseUrl}/signup`, formData);
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
