@@ -134,11 +134,29 @@ export default function Dashboard() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${baseUrl}/logout`, {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      localStorage.removeItem('token');
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.dashboardContainer}>
         <div className={styles.dashboardHeader}>
           <h1 className={styles.dashboardTitle}>Your Files</h1>
+          <button onClick={handleLogout} className={styles.logoutButton}>
+            Logout
+          </button>
           <label className={styles.uploadButton}>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
