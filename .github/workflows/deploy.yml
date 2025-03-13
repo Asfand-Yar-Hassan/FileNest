@@ -15,6 +15,7 @@ jobs:
 
       - name: Set up SSH key
         run: |
+          mkdir -p ~/.ssh  # Ensure SSH directory exists
           echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws_key.pem
           chmod 600 ~/.ssh/aws_key.pem
 
