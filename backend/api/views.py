@@ -98,10 +98,13 @@ def dashboard(request):
 def logout_view(request):
     if request.method == "POST":
         try:
-            if request.COOKIES.get("user_id"):
-                response = JsonResponse({"message": "User logged out"})
-                response.delete_cookie("user_id")
-                return response
+            auth_header = request.headers.get('Authorization')
+            if not auth_header or not auth_header.startswith('Bearer '):
+                return JsonResponse({"message": "Invalid authorization header"}, status=401)
+
+            token = auth_header.split(' ')[1]
+            if token:
+                return JsonResponse({"message": "User logged out successfully"})
             else:
                 return JsonResponse({"message": "User not logged in"}, status=400)
         except Exception as e:
